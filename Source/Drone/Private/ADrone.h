@@ -24,6 +24,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PWM)
 		float PWM1;
@@ -46,6 +47,18 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float Thrust;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+		float KP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+		float KI;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+		float KD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+		float Sat;
 
 
 public:	
