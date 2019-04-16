@@ -34,9 +34,13 @@ void AADrone::Tick(float DeltaTime)
 {
 	if (PIDRollRateController && PIDPitchRateController && PIDYawRateController)
 	{
-		float RollCmd = PIDRollRateController->evaluate(RollTarget, GetActorRotation().Roll, DeltaTime);
-		float PitchCmd = PIDPitchRateController->evaluate(PitchTarget, GetActorRotation().Pitch, DeltaTime);
-		float YawCmd = 0.0f;
+		FRotator TargetRotator = FRotator(PitchTarget, YawTarget, RollTarget);
+		TargetRotator.Normalize();
+		FRotator Error = TargetRotator - GetActorRotation();
+		Error.Normalize();
+		float RollCmd = PIDRollRateController->evaluate(Error.Roll, DeltaTime);
+		float PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
+		float YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
 
 		PWM1 = - YawCmd + RollCmd + PitchCmd;
 		PWM2 = + YawCmd - RollCmd + PitchCmd;

@@ -23,9 +23,8 @@ public:
 		this->saturation = sat;
 	}
 
-	float evaluate(float target, float current, float delta_t)
+	float evaluate(float error, float delta_t)
 	{
-		float error = target - current;
 		if (!saturation_flag)
 		{
 			integral = integral + error * delta_t;

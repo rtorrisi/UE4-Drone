@@ -46,6 +46,9 @@ protected:
 		float RollTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		float YawTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float Thrust;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
