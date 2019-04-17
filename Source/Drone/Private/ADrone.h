@@ -16,6 +16,7 @@ private:
 	PIDSat* PIDRollRateController = nullptr;
 	PIDSat* PIDPitchRateController = nullptr;
 	PIDSat* PIDYawRateController = nullptr;
+	PIDSat* PIDThrustController = nullptr;
 
 public:
 	// Sets default values for this pawn's properties
@@ -38,6 +39,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PWM)
 		float PWM4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	float ZTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float PitchTarget;
@@ -51,16 +54,28 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float Thrust;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KPThrust = 4.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KIThrust = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KDThrust = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float SatThrust = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KP;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KD;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float Sat;
 
 
