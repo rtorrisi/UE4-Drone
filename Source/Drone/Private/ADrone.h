@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PIDSat.h"
+#include "ProfilePositionController.h"
 #include "ADrone.generated.h"
 
 UCLASS()
@@ -17,6 +18,7 @@ private:
 	PIDSat* PIDPitchRateController = nullptr;
 	PIDSat* PIDYawRateController = nullptr;
 	PIDSat* PIDThrustController = nullptr;
+	ProfilePositionController* ProfileGenerator = nullptr;
 
 public:
 	// Sets default values for this pawn's properties
