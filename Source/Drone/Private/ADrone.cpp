@@ -19,7 +19,7 @@ void AADrone::BeginPlay()
 	PIDPitchRateController = new PIDSat(KP, KI, KD, Sat);
 	PIDYawRateController = new PIDSat(KP, KI, KD, Sat);
 	PIDThrustController = new PIDSat(KPThrust, KIThrust, KDThrust, SatThrust, 0.0f);
-	ProfileGenerator = new ProfilePositionController(10.0f, 3.0f, 1.5f);
+	ProfileGenerator = new ProfilePositionController(10.0f, 5.0f, 2.5f);
 }
 
 void AADrone::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -59,7 +59,7 @@ void AADrone::Tick(float DeltaTime)
 		PWM3cmd = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM3cmd);
 		PWM4cmd = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM4cmd);
 
-		const float ThrustPerc = 0.7f;
+		const float ThrustPerc = 0.70f;
 		const float CmdPerc = 0.3f;
 
 		PWM1 = ThrustPerc * Thrust + CmdPerc * PWM1cmd;
