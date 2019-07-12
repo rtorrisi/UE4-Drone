@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "PIDSat.h"
 #include "ADrone.generated.h"
+
+class PIDSat;
+class ProfilePositionController;
 
 UCLASS()
 class AADrone : public APawn
@@ -16,6 +18,8 @@ private:
 	PIDSat* PIDRollRateController = nullptr;
 	PIDSat* PIDPitchRateController = nullptr;
 	PIDSat* PIDYawRateController = nullptr;
+	PIDSat* PIDThrustController = nullptr;
+	ProfilePositionController* ProfileGenerator = nullptr;
 
 public:
 	// Sets default values for this pawn's properties
@@ -68,17 +72,29 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float Thrust = 0.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		float ZTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KP;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KI;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KD;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float Sat = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KPThrust = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KIThrust = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
+		float KDThrust = 1.0f;
 
 
 public:	
