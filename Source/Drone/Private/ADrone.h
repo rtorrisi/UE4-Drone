@@ -66,7 +66,7 @@ protected:
 		float YawTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-		float Thrust;
+		float Thrust = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
 		float KP;
@@ -78,7 +78,7 @@ protected:
 		float KD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSat)
-		float Sat;
+		float Sat = 0.1f;
 
 
 public:	

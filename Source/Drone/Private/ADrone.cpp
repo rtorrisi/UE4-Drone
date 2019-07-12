@@ -15,9 +15,9 @@ void AADrone::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PIDRollRateController = new PIDSat(KP, KI, KD);
-	PIDPitchRateController = new PIDSat(KP, KI, KD);
-	PIDYawRateController = new PIDSat(KP, KI, KD);
+	PIDRollRateController = new PIDSat(KP, KI, KD, Sat);
+	PIDPitchRateController = new PIDSat(KP, KI, KD, Sat);
+	PIDYawRateController = new PIDSat(KP, KI, KD, Sat);
 }
 
 void AADrone::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -46,22 +46,26 @@ void AADrone::Tick(float DeltaTime)
 		RollCmd = PIDRollRateController->evaluate(Error.Roll, DeltaTime);
 		PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
 		YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
-		YawCmd = 0;
 
-		//PWM1 = - YawCmd + RollCmd + PitchCmd;
-		//PWM2 = + YawCmd - RollCmd + PitchCmd;
-		//PWM3 = - YawCmd - RollCmd - PitchCmd;
-		//PWM4 = + YawCmd + RollCmd - PitchCmd;
+		float MinThrustPWM1 = FMath::Max(0.f, -(-YawCmd + RollCmd + PitchCmd));
+		float MinThrustPWM2 = FMath::Max(0.f, -(+YawCmd - RollCmd + PitchCmd));
+		float MinThrustPWM3 = FMath::Max(0.f, -(-YawCmd - RollCmd - PitchCmd));
+		float MinThrustPWM4 = FMath::Max(0.f, -(+YawCmd + RollCmd - PitchCmd));
 
-		PWM1 = Thrust + PitchCmd;
-		PWM2 = Thrust + PitchCmd;
-		PWM3 = Thrust - PitchCmd;
-		PWM4 = Thrust - PitchCmd;
+		float MaxThrustPWM1 = FMath::Min(1.f, (1.f - (-YawCmd + RollCmd + PitchCmd)));
+		float MaxThrustPWM2 = FMath::Min(1.f, (1.f - (+YawCmd - RollCmd + PitchCmd)));
+		float MaxThrustPWM3 = FMath::Min(1.f, (1.f - (-YawCmd - RollCmd - PitchCmd)));
+		float MaxThrustPWM4 = FMath::Min(1.f, (1.f - (+YawCmd + RollCmd - PitchCmd)));
 
-		//PWM1 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM1) * Thrust;
-		//PWM2 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM2) * Thrust;
-		//PWM3 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM3) * Thrust;
-		//PWM4 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM4) * Thrust;
+		float ThrustPWM1 = FMath::Clamp(Thrust, MinThrustPWM1, MaxThrustPWM1);
+		float ThrustPWM2 = FMath::Clamp(Thrust, MinThrustPWM2, MaxThrustPWM2);
+		float ThrustPWM3 = FMath::Clamp(Thrust, MinThrustPWM3, MaxThrustPWM3);
+		float ThrustPWM4 = FMath::Clamp(Thrust, MinThrustPWM4, MaxThrustPWM4);
+
+		PWM1 = - YawCmd + RollCmd + PitchCmd + ThrustPWM1;
+		PWM2 = + YawCmd - RollCmd + PitchCmd + ThrustPWM2;
+		PWM3 = - YawCmd - RollCmd - PitchCmd + ThrustPWM3;
+		PWM4 = + YawCmd + RollCmd - PitchCmd + ThrustPWM4;
 		
 	}
 	Super::Tick(DeltaTime);
