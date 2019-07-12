@@ -97,6 +97,9 @@ protected:
 		float KDThrust = 1.0f;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AltitudeController)
+		bool AltitudeControllerEnable = false;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

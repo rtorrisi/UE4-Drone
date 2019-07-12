@@ -54,8 +54,11 @@ void AADrone::Tick(float DeltaTime)
 		PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
 		YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
 
-		float TargetSpeed = ProfileGenerator->evaluate(ZTarget / 100.f, GetActorLocation().Z / 100.f, GetVelocity().Z / 100.f, DeltaTime);
-		Thrust = PIDThrustController->evaluate(TargetSpeed - GetVelocity().Z / 100.f, DeltaTime);
+		if(AltitudeControllerEnable)
+		{
+			float TargetSpeed = ProfileGenerator->evaluate(ZTarget / 100.f, GetActorLocation().Z / 100.f, GetVelocity().Z / 100.f, DeltaTime);
+			Thrust = PIDThrustController->evaluate(TargetSpeed - GetVelocity().Z / 100.f, DeltaTime);
+		}
 
 		float MinThrustPWM1 = FMath::Max(0.f, -(-YawCmd + RollCmd + PitchCmd));
 		float MinThrustPWM2 = FMath::Max(0.f, -(+YawCmd - RollCmd + PitchCmd));
