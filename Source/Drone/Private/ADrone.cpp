@@ -15,9 +15,9 @@ void AADrone::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PIDRollRateController = new PIDSat(KP, KI, KD, Sat);
-	PIDPitchRateController = new PIDSat(KP, KI, KD, Sat);
-	PIDYawRateController = new PIDSat(KP, KI, KD, Sat);
+	PIDRollRateController = new PIDSat(KP, KI, KD);
+	PIDPitchRateController = new PIDSat(KP, KI, KD);
+	PIDYawRateController = new PIDSat(KP, KI, KD);
 }
 
 void AADrone::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -38,19 +38,30 @@ void AADrone::Tick(float DeltaTime)
 		TargetRotator.Normalize();
 		FRotator Error = TargetRotator - GetActorRotation();
 		Error.Normalize();
-		float RollCmd = PIDRollRateController->evaluate(Error.Roll, DeltaTime);
-		float PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
-		float YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
 
-		PWM1 = - YawCmd + RollCmd + PitchCmd;
-		PWM2 = + YawCmd - RollCmd + PitchCmd;
-		PWM3 = - YawCmd - RollCmd - PitchCmd;
-		PWM4 = + YawCmd + RollCmd - PitchCmd;
+		ErrorRoll = Error.Roll;
+		ErrorPitch = Error.Pitch;
+		ErrorYaw = Error.Yaw;
 
-		PWM1 = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM1) * Thrust;
-		PWM2 = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM2) * Thrust;
-		PWM3 = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM3) * Thrust;
-		PWM4 = FMath::GetMappedRangeValueClamped(FVector2D(-3.0f, 3.0f), FVector2D(0.0f, 1.0f), PWM4) * Thrust;
+		RollCmd = PIDRollRateController->evaluate(Error.Roll, DeltaTime);
+		PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
+		YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
+		YawCmd = 0;
+
+		//PWM1 = - YawCmd + RollCmd + PitchCmd;
+		//PWM2 = + YawCmd - RollCmd + PitchCmd;
+		//PWM3 = - YawCmd - RollCmd - PitchCmd;
+		//PWM4 = + YawCmd + RollCmd - PitchCmd;
+
+		PWM1 = Thrust + PitchCmd;
+		PWM2 = Thrust + PitchCmd;
+		PWM3 = Thrust - PitchCmd;
+		PWM4 = Thrust - PitchCmd;
+
+		//PWM1 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM1) * Thrust;
+		//PWM2 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM2) * Thrust;
+		//PWM3 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM3) * Thrust;
+		//PWM4 = FMath::GetMappedRangeValueClamped(FVector2D(-1.0f, 1.0f), FVector2D(0.0f, 1.0f), PWM4) * Thrust;
 		
 	}
 	Super::Tick(DeltaTime);

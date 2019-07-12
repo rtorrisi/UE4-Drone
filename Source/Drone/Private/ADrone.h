@@ -38,6 +38,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PWM)
 		float PWM4;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CMD)
+		float RollCmd;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CMD)
+		float PitchCmd;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CMD)
+		float YawCmd;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Err)
+		float ErrorRoll;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Err)
+		float ErrorPitch;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Err)
+		float ErrorYaw;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		float PitchTarget;
