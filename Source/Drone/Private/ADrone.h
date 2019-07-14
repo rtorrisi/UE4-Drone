@@ -19,7 +19,13 @@ private:
 	PIDSat* PIDPitchRateController = nullptr;
 	PIDSat* PIDYawRateController = nullptr;
 	PIDSat* PIDThrustController = nullptr;
-	ProfilePositionController* ProfileGenerator = nullptr;
+
+	PIDSat* PIDRollController = nullptr;
+	PIDSat* PIDPitchController = nullptr;
+
+	ProfilePositionController* ProfileGeneratorZ = nullptr;
+	ProfilePositionController* ProfileGeneratorY = nullptr;
+	ProfilePositionController* ProfileGeneratorX = nullptr;
 
 public:
 	// Sets default values for this pawn's properties
@@ -73,7 +79,13 @@ protected:
 		float Thrust = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-		float ZTarget;
+		float TargetX;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		float TargetY;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		float TargetZ;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KP;
@@ -96,9 +108,47 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PIDSatController)
 		float KDThrust = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float KPPitchRoll = 2.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float KIPitchRoll = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float KDPitchRoll = 4.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AltitudeController)
 		bool AltitudeControllerEnable = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AltitudeController)
+		bool PositionControllerEnable = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxSpeedX = 10.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxSpeedY = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxSpeedZ = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxAccelerationX = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxAccelerationY = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxAccelerationZ = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxDecelerationX = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxDecelerationY = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
+		float MaxDecelerationZ = 1.5f;
 
 public:	
 	// Called every frame

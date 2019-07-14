@@ -21,8 +21,13 @@ void AADrone::BeginPlay()
 	PIDPitchRateController = new PIDSat(KP, KI, KD, Sat);
 	PIDYawRateController = new PIDSat(KP, KI, KD, Sat);
 	PIDThrustController = new PIDSat(KPThrust, KIThrust, KDThrust, 1.0f, 0.0f);
-	ProfileGenerator = new ProfilePositionController(10.0f, 3.0f, 1.5f);
+	
+	PIDRollController = new PIDSat(KPPitchRoll, KIPitchRoll, KDPitchRoll, 40.0f);
+	PIDPitchController = new PIDSat(KPPitchRoll, KIPitchRoll, KDPitchRoll, 40.0f);
 
+	ProfileGeneratorX = new ProfilePositionController(MaxSpeedX, MaxAccelerationX, MaxDecelerationX);
+	ProfileGeneratorY = new ProfilePositionController(MaxSpeedY, MaxAccelerationY, MaxDecelerationY);
+	ProfileGeneratorZ = new ProfilePositionController(MaxSpeedZ, MaxAccelerationZ, MaxDecelerationZ);
 }
 
 void AADrone::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -33,14 +38,50 @@ void AADrone::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	delete PIDPitchRateController;
 	delete PIDYawRateController;
 	delete PIDThrustController;
-	delete ProfileGenerator;
+	delete PIDRollController;
+	delete PIDPitchController;
+	delete ProfileGeneratorX;
+	delete ProfileGeneratorY;
+	delete ProfileGeneratorZ;
 }
 
 // Called every frame
 void AADrone::Tick(float DeltaTime)
 {
-	if (PIDRollRateController && PIDPitchRateController && PIDYawRateController && PIDThrustController && ProfileGenerator)
+	if (PIDRollRateController && PIDPitchRateController && PIDYawRateController && PIDThrustController && ProfileGeneratorX && ProfileGeneratorY && ProfileGeneratorZ)
 	{
+		if (AltitudeControllerEnable)
+		{
+			float ErrorZ = TargetZ - GetActorLocation().Z;
+			float ErrorInMeterZ = ErrorZ / 100.f;
+			float VelocityInMeterZ = GetVelocity().Z / 100.f;
+
+			float TargetSpeedZ = ProfileGeneratorZ->evaluate(ErrorInMeterZ, VelocityInMeterZ, DeltaTime);
+			Thrust = PIDThrustController->evaluate(TargetSpeedZ - VelocityInMeterZ, DeltaTime);
+		}
+
+		if (PositionControllerEnable)
+		{
+			FVector2D Error = FVector2D(TargetX - GetActorLocation().X, TargetY - GetActorLocation().Y);
+			FVector2D ErrorInMeter = Error / 100.f;
+
+			FVector2D VelocityInMeter = FVector2D(GetVelocity().X / 100.f, GetVelocity().Y / 100.f);
+			
+			FVector2D GlobalTargetSpeed = FVector2D(
+				ProfileGeneratorX->evaluate(ErrorInMeter.X, VelocityInMeter.X, DeltaTime),
+				ProfileGeneratorY->evaluate(ErrorInMeter.Y, VelocityInMeter.Y, DeltaTime)
+			);
+			
+			float CosYaw = FMath::Cos(FMath::DegreesToRadians(-GetActorRotation().Yaw));
+			float SinYaw = FMath::Sin(FMath::DegreesToRadians(-GetActorRotation().Yaw));
+
+			FVector2D LocalCurrentSpeed = FVector2D(CosYaw * VelocityInMeter.X - SinYaw * VelocityInMeter.Y, SinYaw * VelocityInMeter.X + CosYaw * VelocityInMeter.Y);
+			FVector2D LocalTargetSpeed = FVector2D(CosYaw * GlobalTargetSpeed.X - SinYaw * GlobalTargetSpeed.Y, SinYaw * GlobalTargetSpeed.X + CosYaw * GlobalTargetSpeed.Y);
+
+			RollTarget = PIDRollController->evaluate(LocalTargetSpeed.Y - LocalCurrentSpeed.Y, DeltaTime);
+			PitchTarget = -PIDPitchController->evaluate(LocalTargetSpeed.X - LocalCurrentSpeed.X, DeltaTime);
+		}
+
 		FRotator TargetRotator = FRotator(PitchTarget, YawTarget, RollTarget);
 		TargetRotator.Normalize();
 		FRotator Error = TargetRotator - GetActorRotation();
@@ -53,12 +94,6 @@ void AADrone::Tick(float DeltaTime)
 		RollCmd = PIDRollRateController->evaluate(Error.Roll, DeltaTime);
 		PitchCmd = PIDPitchRateController->evaluate(Error.Pitch, DeltaTime);
 		YawCmd = PIDYawRateController->evaluate(Error.Yaw, DeltaTime);
-
-		if(AltitudeControllerEnable)
-		{
-			float TargetSpeed = ProfileGenerator->evaluate(ZTarget / 100.f, GetActorLocation().Z / 100.f, GetVelocity().Z / 100.f, DeltaTime);
-			Thrust = PIDThrustController->evaluate(TargetSpeed - GetVelocity().Z / 100.f, DeltaTime);
-		}
 
 		float MinThrustPWM1 = FMath::Max(0.f, -(-YawCmd + RollCmd + PitchCmd));
 		float MinThrustPWM2 = FMath::Max(0.f, -(+YawCmd - RollCmd + PitchCmd));

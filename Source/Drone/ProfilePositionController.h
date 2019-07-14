@@ -19,25 +19,24 @@ public:
 		this->output_speed = 0.0f; // la velocita' a cui andremo
 	}
 
-	float evaluate(float target_position, float current_position, float current_speed, float delta_t)
+	float evaluate(float error, float current_speed, float delta_t)
 	{
-		float distance = target_position - current_position;
 		// calcoliamo il segno e usiamo distanze sempre positive
 		float s;
-		if (distance >= 0)
+		if (error >= 0)
 		{
 			s = 1;
 		}
 		else
 		{
 			s = -1;
-			distance = -distance;
+			error = -error;
 		}
 
-		if (distance < decel_distance)
+		if (error < decel_distance)
 		{
 			//ok siamo nella fase di decelerazione
-			float vel_attesa = FGenericPlatformMath::Sqrt(max_speed * max_speed - 2 * decel * (decel_distance - distance));
+			float vel_attesa = FGenericPlatformMath::Sqrt(FMath::Max(0.0f, max_speed * max_speed - 2 * decel * (decel_distance - error)));
 			if (vel_attesa > output_speed)
 			{
 				//uhm... strana condizione,
