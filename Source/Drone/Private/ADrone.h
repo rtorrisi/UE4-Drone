@@ -150,6 +150,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProfileController)
 		float MaxDecelerationZ = 1.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
+		FVector DebugGlobalTargetSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
+		FVector DebugLocalTargetSpeed;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

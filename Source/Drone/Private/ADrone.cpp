@@ -57,6 +57,8 @@ void AADrone::Tick(float DeltaTime)
 			float VelocityInMeterZ = GetVelocity().Z / 100.f;
 
 			float TargetSpeedZ = ProfileGeneratorZ->evaluate(ErrorInMeterZ, VelocityInMeterZ, DeltaTime);
+			DebugGlobalTargetSpeed.Z = TargetSpeedZ;
+			DebugLocalTargetSpeed.Z = TargetSpeedZ;
 			Thrust = PIDThrustController->evaluate(TargetSpeedZ - VelocityInMeterZ, DeltaTime);
 		}
 
@@ -72,15 +74,22 @@ void AADrone::Tick(float DeltaTime)
 				ProfileGeneratorY->evaluate(ErrorInMeter.Y, VelocityInMeter.Y, DeltaTime)
 			);
 			
+			DebugGlobalTargetSpeed.X = GlobalTargetSpeed.X;
+			DebugGlobalTargetSpeed.Y = GlobalTargetSpeed.Y;
+
 			float CosYaw = FMath::Cos(FMath::DegreesToRadians(-GetActorRotation().Yaw));
 			float SinYaw = FMath::Sin(FMath::DegreesToRadians(-GetActorRotation().Yaw));
 
 			FVector2D LocalCurrentSpeed = FVector2D(CosYaw * VelocityInMeter.X - SinYaw * VelocityInMeter.Y, SinYaw * VelocityInMeter.X + CosYaw * VelocityInMeter.Y);
 			FVector2D LocalTargetSpeed = FVector2D(CosYaw * GlobalTargetSpeed.X - SinYaw * GlobalTargetSpeed.Y, SinYaw * GlobalTargetSpeed.X + CosYaw * GlobalTargetSpeed.Y);
 
+			DebugLocalTargetSpeed.X = LocalTargetSpeed.X;
+			DebugLocalTargetSpeed.Y = LocalTargetSpeed.Y;
+
 			RollTarget = PIDRollController->evaluate(LocalTargetSpeed.Y - LocalCurrentSpeed.Y, DeltaTime);
 			PitchTarget = -PIDPitchController->evaluate(LocalTargetSpeed.X - LocalCurrentSpeed.X, DeltaTime);
 		}
+
 
 		FRotator TargetRotator = FRotator(PitchTarget, YawTarget, RollTarget);
 		TargetRotator.Normalize();
